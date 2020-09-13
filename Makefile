@@ -11,7 +11,7 @@ STRIP = strip
 INC_DIR = ./include
 SRC_DIR = ./src
 OBJ_DIR = ./obj
-BIN_DIR = ./bin
+BIN_DIR = ./
 
 #DEBUG_MODE=TRUE
 PKGS =
@@ -21,13 +21,11 @@ CFLAGS += -g -ggdb -D_GLIBCXX_DEBUG
 endif
 
 INCLUDE += -I $(INC_DIR)
-CFLAGS += -Wall -lglut -lGL
+CFLAGS += -Wall 
 CPPFLAGS += -std=c++14
-PROJ_NAME = proj2
+PROJ_NAME = test
 
-PROJ_OBJS = $(OBJ_DIR)/proj2.o
-MAIN_OBJS = $(OBJ_DIR)/main.o
-
+PROJ_OBJS = $(OBJ_DIR)/test.o
 all: directories $(BIN_DIR)/$(PROJ_NAME)
 $(BIN_DIR)/$(PROJ_NAME): directories $(PROJ_OBJS) $(MAIN_OBJS)
 	$(CXX) $(PROJ_OBJS) $(MAIN_OBJS) -o $(BIN_DIR)/$(PROJ_NAME) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
