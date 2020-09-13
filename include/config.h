@@ -63,6 +63,9 @@
 /* Define to compile in single precision. */
 #define FFTW_SINGLE 1
 
+/* Using gromacs built-in XDR library */
+#define GMX_INTERNAL_XDR 1
+
 /* Define to 1 if you have the `abort' function. */
 #define HAVE_ABORT 1
 
