@@ -34,23 +34,54 @@
  * To help us fund GROMACS development, we humbly ask that you cite
  * the research papers on the package. Check out http://www.gromacs.org.
  */
-/*! \libinternal \file
- * \brief
- * Declares please_cite() for printing out literature references.
- * Declares writeSourceDoi for printing of source code DOI.
- *
- * \inlibraryapi
- * \ingroup module_utility
- */
-#ifndef GMX_UTILITY_PLEASECITE_H
-#define GMX_UTILITY_PLEASECITE_H
+#ifndef GMX_FILEIO_XDRF_H
+#define GMX_FILEIO_XDRF_H
 
-#include <cstdio>
+#include <stdio.h>
 
-//! Print a message asking to cite something
-void please_cite(FILE* fp, const char* key);
+#include "gromacs/utility/basedefinitions.h"
+#include "gromacs/utility/real.h"
 
-//! Write to \c fplog to request citation of GROMACS papers and source DOI.
-void pleaseCiteGromacs(FILE* fplog);
+#ifdef __PGI /*Portland group compiler*/
+#    define int64_t long long
+#endif
+
+#include "config.h"
+
+#if GMX_INTERNAL_XDR
+#    include "gromacs/fileio/gmx_internal_xdr.h"
+#else
+#    include <rpc/rpc.h>
+#    include <rpc/xdr.h>
+#endif
+
+/* Read or write reduced precision *float* coordinates */
+int xdr3dfcoord(XDR* xdrs, float* fp, int* size, float* precision);
+
+
+/* Read or write a *real* value (stored as float) */
+int xdr_real(XDR* xdrs, real* r);
+
+
+/* Read or write reduced precision *real* coordinates */
+int xdr3drcoord(XDR* xdrs, real* fp, int* size, real* precision);
+
+
+//! Read or write a int32_t value.
+int xdr_int32(XDR* xdrs, int32_t* i);
+
+//! Read or write a int64_t value.
+int xdr_int64(XDR* xdrs, int64_t* i);
+
+int xdr_xtc_seek_time(real time, FILE* fp, XDR* xdrs, int natoms, gmx_bool bSeekForwardOnly);
+
+
+int xdr_xtc_seek_frame(int frame, FILE* fp, XDR* xdrs, int natoms);
+
+
+float xdr_xtc_get_last_frame_time(FILE* fp, XDR* xdrs, int natoms, gmx_bool* bOK);
+
+
+int xdr_xtc_get_last_frame_number(FILE* fp, XDR* xdrs, int natoms, gmx_bool* bOK);
 
 #endif
