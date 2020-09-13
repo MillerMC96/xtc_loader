@@ -11,7 +11,7 @@ STRIP = strip
 INC_DIR = ./include
 SRC_DIR = ./src
 OBJ_DIR = ./obj
-BIN_DIR = ./
+BIN_DIR = ./bin
 
 #DEBUG_MODE=TRUE
 PKGS =
