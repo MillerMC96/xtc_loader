@@ -3,7 +3,7 @@
  *
  * Copyright (c) 1991-2000, University of Groningen, The Netherlands.
  * Copyright (c) 2001-2004, The GROMACS development team.
- * Copyright (c) 2013,2014,2015,2016,2018,2019, by the GROMACS development team, led by
+ * Copyright (c) 2013,2014,2015,2016,2019, by the GROMACS development team, led by
  * Mark Abraham, David van der Spoel, Berk Hess, and Erik Lindahl,
  * and including many others, as listed in the AUTHORS file in the
  * top-level source directory and at http://www.gromacs.org.
@@ -34,48 +34,36 @@
  * To help us fund GROMACS development, we humbly ask that you cite
  * the research papers on the package. Check out http://www.gromacs.org.
  */
-
-#ifndef GMX_FILEIO_XTCIO_H
-#define GMX_FILEIO_XTCIO_H
-
-#include "gromacs/math/vectypes.h"
-#include "gromacs/utility/basedefinitions.h"
-#include "gromacs/utility/real.h"
-
-struct t_fileio;
-
-/* All functions return 1 if successful, 0 otherwise
- * bOK tells if a frame is not corrupted
+/*! \libinternal \file
+ * \brief
+ * Provides OS-specific directory-name separator
+ *
+ * \inlibraryapi
+ * \ingroup module_utility
  */
+#ifndef GMX_UTILITY_DIR_SEPARATOR_H
+#define GMX_UTILITY_DIR_SEPARATOR_H
 
-/* Note that XTC was implemented to use xdr_int for the step number,
- * which is defined by the standard to be signed and 32 bit. We didn't
- * design the format to be extensible, so we can't fix the fact that
- * after 2^31 frames, step numbers will wrap to be
- * negative. Fortunately, this tends not to cause serious problems,
- * and we've fixed it in TNG. */
+#include "config.h"
 
-/* mode: r, w, x and a */
-struct t_fileio* open_xtc(const char* filename, const char* mode);
-/* Open a file for xdr I/O */
-
-void close_xtc(struct t_fileio* fio);
-/* Close the file for xdr I/O */
-
-int read_first_xtc(struct t_fileio* fio,
-                   int*             natoms,
-                   int64_t*         step,
-                   real*            time,
-                   matrix           box,
-                   rvec**           x,
-                   real*            prec,
-                   gmx_bool*        bOK);
-/* Open xtc file, read xtc file first time, allocate memory for x */
-
-int read_next_xtc(struct t_fileio* fio, int natoms, int64_t* step, real* time, matrix box, rvec* x, real* prec, gmx_bool* bOK);
-/* Read subsequent frames */
-
-int write_xtc(struct t_fileio* fio, int natoms, int64_t step, real time, const rvec* box, const rvec* x, real prec);
-/* Write a frame to xtc file */
+/*! \def DIR_SEPARATOR
+ * \brief
+ * Directory separator on this OS.
+ *
+ * Native Windows uses backslash path separators (but accepts also slashes).
+ * Cygwin and most other systems use slash.
+ *
+ * \todo Get rid of this (Redmine #950). It is not necessary for
+ * constructing paths on the systems that it currently supports, and
+ * is not reliable in parsing input paths either, since Windows needs
+ * to accept both instead of only DIR_SEPARATOR. At the very least, we
+ * should refactor the clients of this header so that they operate
+ * upon path objects rather than raw path strings.
+ */
+#if GMX_NATIVE_WINDOWS
+#    define DIR_SEPARATOR '\\'
+#else
+#    define DIR_SEPARATOR '/'
+#endif
 
 #endif

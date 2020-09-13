@@ -3,7 +3,7 @@
  *
  * Copyright (c) 1991-2000, University of Groningen, The Netherlands.
  * Copyright (c) 2001-2004, The GROMACS development team.
- * Copyright (c) 2013,2014,2015,2016,2018,2019, by the GROMACS development team, led by
+ * Copyright (c) 2013,2014,2015,2019, by the GROMACS development team, led by
  * Mark Abraham, David van der Spoel, Berk Hess, and Erik Lindahl,
  * and including many others, as listed in the AUTHORS file in the
  * top-level source directory and at http://www.gromacs.org.
@@ -34,48 +34,52 @@
  * To help us fund GROMACS development, we humbly ask that you cite
  * the research papers on the package. Check out http://www.gromacs.org.
  */
-
-#ifndef GMX_FILEIO_XTCIO_H
-#define GMX_FILEIO_XTCIO_H
-
-#include "gromacs/math/vectypes.h"
-#include "gromacs/utility/basedefinitions.h"
-#include "gromacs/utility/real.h"
-
-struct t_fileio;
-
-/* All functions return 1 if successful, 0 otherwise
- * bOK tells if a frame is not corrupted
+/*! \internal \file
+ * \brief
+ * Internal definitions shared by gmxfio*.c files.
  */
+#ifndef GMX_FILEIO_GMXFIO_IMPL_H
+#define GMX_FILEIO_GMXFIO_IMPL_H
 
-/* Note that XTC was implemented to use xdr_int for the step number,
- * which is defined by the standard to be signed and 32 bit. We didn't
- * design the format to be extensible, so we can't fix the fact that
- * after 2^31 frames, step numbers will wrap to be
- * negative. Fortunately, this tends not to cause serious problems,
- * and we've fixed it in TNG. */
+/* This is the new improved and thread safe version of gmxfio.  */
 
-/* mode: r, w, x and a */
-struct t_fileio* open_xtc(const char* filename, const char* mode);
-/* Open a file for xdr I/O */
 
-void close_xtc(struct t_fileio* fio);
-/* Close the file for xdr I/O */
+/* WARNING WARNING WARNING WARNING
+   The data types used here are PRIVATE to gmxfio routines. DO NOT use them
+   directly in your own code, but use the external functions provided in
+   include/gmxfio.h
 
-int read_first_xtc(struct t_fileio* fio,
-                   int*             natoms,
-                   int64_t*         step,
-                   real*            time,
-                   matrix           box,
-                   rvec**           x,
-                   real*            prec,
-                   gmx_bool*        bOK);
-/* Open xtc file, read xtc file first time, allocate memory for x */
+   If you don't heed this warning, your code will suddenly stop working
+   at some point in the not-so-distant future.
 
-int read_next_xtc(struct t_fileio* fio, int natoms, int64_t* step, real* time, matrix box, rvec* x, real* prec, gmx_bool* bOK);
-/* Read subsequent frames */
+   WARNING WARNING WARNING WARNING */
 
-int write_xtc(struct t_fileio* fio, int natoms, int64_t step, real time, const rvec* box, const rvec* x, real prec);
-/* Write a frame to xtc file */
+#include "thread_mpi/lock.h"
+
+#include "gromacs/fileio/xdrf.h"
+
+struct t_fileio
+{
+    FILE*    fp;         /* the file pointer */
+    gmx_bool bRead,      /* the file is open for reading */
+            bDouble,     /* write doubles instead of floats */
+            bReadWrite;  /* the file is open for reading and writing */
+    char*       fn;      /* the file name */
+    XDR*        xdr;     /* the xdr data pointer */
+    enum xdr_op xdrmode; /* the xdr mode */
+    int         iFTP;    /* the file type identifier */
+
+    t_fileio *next, *prev; /* next and previous file pointers in the
+                              linked list */
+    tMPI_Lock_t mtx;       /* content locking mutex. This is a fast lock
+                              for performance reasons: in some cases every
+                              single byte that gets read/written requires
+                              a lock */
+};
+
+/** lock the mutex associated with a fio  */
+void gmx_fio_lock(t_fileio* fio);
+/** unlock the mutex associated with a fio  */
+void gmx_fio_unlock(t_fileio* fio);
 
 #endif

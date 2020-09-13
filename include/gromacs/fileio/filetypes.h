@@ -3,7 +3,7 @@
  *
  * Copyright (c) 1991-2000, University of Groningen, The Netherlands.
  * Copyright (c) 2001-2004, The GROMACS development team.
- * Copyright (c) 2013,2014,2015,2016,2018,2019, by the GROMACS development team, led by
+ * Copyright (c) 2013,2014,2015,2019, by the GROMACS development team, led by
  * Mark Abraham, David van der Spoel, Berk Hess, and Erik Lindahl,
  * and including many others, as listed in the AUTHORS file in the
  * top-level source directory and at http://www.gromacs.org.
@@ -34,48 +34,88 @@
  * To help us fund GROMACS development, we humbly ask that you cite
  * the research papers on the package. Check out http://www.gromacs.org.
  */
+#ifndef GMX_FILEIO_FILETYPES_H
+#define GMX_FILEIO_FILETYPES_H
 
-#ifndef GMX_FILEIO_XTCIO_H
-#define GMX_FILEIO_XTCIO_H
-
-#include "gromacs/math/vectypes.h"
 #include "gromacs/utility/basedefinitions.h"
-#include "gromacs/utility/real.h"
 
-struct t_fileio;
+/* this enum should correspond to the array deffile in filetypes.cpp */
+enum GromacsFileType
+{
+    efMDP,
+    efTRX,
+    efTRO,
+    efTRN,
+    efTRR,
+    efCOMPRESSED,
+    efXTC,
+    efTNG,
+    efEDR,
+    efSTX,
+    efSTO,
+    efGRO,
+    efG96,
+    efPDB,
+    efBRK,
+    efENT,
+    efESP,
+    efPQR,
+    efCPT,
+    efLOG,
+    efXVG,
+    efOUT,
+    efNDX,
+    efTOP,
+    efITP,
+    efTPS,
+    efTPR,
+    efTEX,
+    efRTP,
+    efATP,
+    efHDB,
+    efDAT,
+    efDLG,
+    efMAP,
+    efEPS,
+    efMAT,
+    efM2P,
+    efMTX,
+    efEDI,
+    efCUB,
+    efXPM,
+    efRND,
+    efNR
+};
 
-/* All functions return 1 if successful, 0 otherwise
- * bOK tells if a frame is not corrupted
- */
+const char* ftp2ext(int ftp);
+/* Return extension for filetype */
 
-/* Note that XTC was implemented to use xdr_int for the step number,
- * which is defined by the standard to be signed and 32 bit. We didn't
- * design the format to be extensible, so we can't fix the fact that
- * after 2^31 frames, step numbers will wrap to be
- * negative. Fortunately, this tends not to cause serious problems,
- * and we've fixed it in TNG. */
+const char* ftp2ext_generic(int ftp);
+/* Return extension for filetype, and a generic name for generic types
+   (e.g. trx)*/
 
-/* mode: r, w, x and a */
-struct t_fileio* open_xtc(const char* filename, const char* mode);
-/* Open a file for xdr I/O */
+const char* ftp2ext_with_dot(int ftp);
+/* Return extension for filetype with a leading dot */
 
-void close_xtc(struct t_fileio* fio);
-/* Close the file for xdr I/O */
+int ftp2generic_count(int ftp);
+/* Return the number of filetypes for a generic filetype */
 
-int read_first_xtc(struct t_fileio* fio,
-                   int*             natoms,
-                   int64_t*         step,
-                   real*            time,
-                   matrix           box,
-                   rvec**           x,
-                   real*            prec,
-                   gmx_bool*        bOK);
-/* Open xtc file, read xtc file first time, allocate memory for x */
+const int* ftp2generic_list(int ftp);
+/* Return the list of filetypes for a generic filetype */
 
-int read_next_xtc(struct t_fileio* fio, int natoms, int64_t* step, real* time, matrix box, rvec* x, real* prec, gmx_bool* bOK);
-/* Read subsequent frames */
+const char* ftp2desc(int ftp);
+/* Return description for file type */
 
-int write_xtc(struct t_fileio* fio, int natoms, int64_t step, real time, const rvec* box, const rvec* x, real prec);
-/* Write a frame to xtc file */
+const char* ftp2defnm(int ftp);
+/* Return default file name for file type */
+
+const char* ftp2defopt(int ftp);
+/* Return default option name for file type */
+
+gmx_bool ftp_is_text(int ftp);
+gmx_bool ftp_is_xdr(int ftp);
+
+int fn2ftp(const char* fn);
+/* Return the filetype corrsponding to filename */
 
 #endif
