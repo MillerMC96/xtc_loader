@@ -53,6 +53,7 @@
  *
  * \inlibraryapi
  */
+#define HAVE_CONFIG_H 1
 //! \cond
 #ifdef HAVE_CONFIG_H
 #    include "gmxpre-config.h"
