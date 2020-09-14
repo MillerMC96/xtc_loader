@@ -4,12 +4,12 @@
 programs := test.x
 
 # User-level thread library
-UTHREADLIB := libuthread
-UTHREADPATH := ../$(UTHREADLIB)
-libuthread := $(UTHREADPATH)/$(UTHREADLIB).a
+UTILITY := utility
+UTILITYPATH := ../$(UTILITY)
+libutility := $(UTILITYPATH)/$(UTILITY).a
 
 # Default rule
-all: $(libuthread) $(programs)
+all: $(libutility) $(programs)
 
 # Avoid builtin rules and variables
 MAKEFLAGS += -rR
@@ -50,13 +50,13 @@ objs := $(patsubst %.x,%.o,$(programs))
 deps := $(patsubst %.o,%.d,$(objs))
 -include $(deps)
 
-# Rule for libuthread.a
-$(libuthread):
+# Rule for libutility.a
+$(libutility):
 	@echo "MAKE	$@"
 	$(Q)$(MAKE) V=$(V) D=$(D) -C $(UTHREADPATH)
 
 # Generic rule for linking final applications
-%.x: %.o $(libuthread)
+%.x: %.o $(libutility)
 	@echo "LD	$@"
 	$(Q)$(CC) $(CFLAGS) -o $@ $< -L$(UTHREADPATH) -luthread 
 
@@ -71,5 +71,5 @@ clean:
 	$(Q)$(MAKE) V=$(V) D=$(D) -C $(UTHREADPATH) clean
 	$(Q)rm -rf $(objs) $(deps) $(programs) 
 
-.PHONY: clean $(libuthread)
+.PHONY: clean $(libutility)
 
