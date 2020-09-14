@@ -1,5 +1,5 @@
 # Target library
-lib := utility.a
+lib := libutility.a
 objs := alignedallocator.o baseversion.o cstringutil.o  fatalerror.o  futil.o  gmxassert.o  matio.o  smalloc.o  stringutil.o
 
 CC := g++
