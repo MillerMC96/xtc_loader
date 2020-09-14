@@ -66,6 +66,9 @@
 /* Using gromacs built-in XDR library */
 #define GMX_INTERNAL_XDR 1
 
+/* No GPU needed */
+#define GMX_GPU 0
+
 /* Define to 1 if you have the `abort' function. */
 #define HAVE_ABORT 1
 
